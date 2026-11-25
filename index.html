@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>FarmDirect — Local Farmers Market Information System</title>
+<style>
+:root{--bg:#f4f7f5;--surface:#fff;--alt:#eef4f0;--primary:#1b6b3a;--dark:#134e2a;--light:#e6f4ec;--accent:#e07a16;--accl:#fef3e6;--danger:#c62828;--dangl:#fdecea;--text:#1a241e;--muted:#5a6b60;--border:#d5e0d9;--shadow:0 4px 14px rgba(18,45,29,.08);--r:14px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.5;min-height:100vh}
+header{background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:40;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.nav-container{max-width:1180px;margin:0 auto;padding:12px 16px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px}
+.brand{display:flex;align-items:center;gap:10px}
+.brand-logo{width:40px;height:40px;background:var(--primary);color:#fff;border-radius:10px;display:grid;place-items:center;font-size:20px}
+.brand h1{font-size:1.2rem;color:var(--dark);line-height:1.2}.brand p{font-size:.78rem;color:var(--muted)}
+.nav-links{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.nav-btn{border:1px solid var(--border);background:var(--surface);color:var(--text);padding:8px 14px;border-radius:999px;font-size:.88rem;font-weight:600;cursor:pointer;text-decoration:none;position:relative}
+.nav-btn:hover{background:var(--alt)}.nav-btn.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.nav-btn.farmer-login{border-color:var(--accent);color:var(--accent);background:var(--accl)}.nav-btn.farmer-login:hover{background:var(--accent);color:#fff}
+.nav-btn.logout{border-color:var(--danger);color:var(--danger);background:var(--dangl)}
+.role-pill{font-size:.78rem;font-weight:700;padding:5px 10px;border-radius:999px;background:var(--light);color:var(--dark)}
+.dot{position:absolute;top:-6px;right:-4px;background:var(--danger);color:#fff;border-radius:999px;font-size:.68rem;padding:1px 6px}
+main{max-width:1180px;margin:0 auto;padding:20px 16px 96px}
+.section{display:none}.section.active{display:block}
+.hero{background:linear-gradient(135deg,#165930,#248248);color:#fff;border-radius:var(--r);padding:22px;margin-bottom:20px;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:16px;box-shadow:var(--shadow)}
+.hero h2{font-size:1.45rem;margin-bottom:4px}.hero p{font-size:.92rem;opacity:.92;max-width:620px}
+.hero-stats{display:flex;gap:14px;flex-wrap:wrap}.stat-box{background:rgba(255,255,255,.14);padding:10px 14px;border-radius:10px;min-width:110px}
+.stat-box strong{display:block;font-size:1.25rem}.stat-box span{font-size:.76rem;opacity:.9}
+.filter-bar{background:var(--surface);padding:14px;border-radius:var(--r);border:1px solid var(--border);display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px;margin-bottom:18px;box-shadow:var(--shadow)}
+input,select,textarea{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-size:.92rem;background:#fff;color:var(--text)}
+input:focus,select:focus{outline:2px solid var(--primary);border-color:var(--primary)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:18px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow);display:flex;flex-direction:column}
+.card-img-wrap{position:relative;height:175px;background:var(--alt);display:grid;place-items:center;font-size:56px}
+.card-img-wrap img{width:100%;height:100%;object-fit:cover;display:block}
+.badge{position:absolute;top:10px;left:10px;background:var(--primary);color:#fff;font-size:.74rem;font-weight:700;padding:4px 10px;border-radius:999px}
+.cat-tag{position:absolute;top:10px;right:10px;background:rgba(255,255,255,.92);font-size:.74rem;font-weight:700;padding:4px 9px;border-radius:999px}
+.card-body{padding:15px;display:flex;flex-direction:column;gap:10px;flex:1}
+.card-title{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}.card-title h3{font-size:1.08rem}
+.savings-pill{background:var(--light);color:var(--dark);font-size:.75rem;font-weight:700;padding:3px 8px;border-radius:6px;white-space:nowrap}
+.price-row{display:flex;align-items:baseline;gap:10px;background:var(--alt);padding:9px 12px;border-radius:10px}
+.farm-price{font-size:1.25rem;font-weight:800;color:var(--dark)}.market-price{font-size:.85rem;color:var(--muted);text-decoration:line-through}
+.meta-list{font-size:.86rem;color:var(--muted);display:grid;gap:4px}.meta-list strong{color:var(--text)}
+.card-actions{margin-top:auto;display:grid;grid-template-columns:1fr 1fr;gap:8px;padding-top:6px}
+.btn{border:none;border-radius:10px;padding:10px 12px;font-size:.88rem;font-weight:700;cursor:pointer;text-align:center;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.btn-primary{background:var(--primary);color:#fff}.btn-primary:hover{background:var(--dark)}.btn-primary:disabled{background:#9db5a6;cursor:not-allowed}
+.btn-outline{background:#fff;color:var(--dark);border:1px solid var(--primary)}.btn-outline:hover{background:var(--light)}
+.btn-accent{background:var(--accent);color:#fff}.btn-danger{background:var(--danger);color:#fff}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:18px;margin-bottom:20px;box-shadow:var(--shadow)}
+.panel h3{margin-bottom:12px;color:var(--dark)}
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}
+.form-group label{display:block;font-size:.82rem;font-weight:700;margin-bottom:4px;color:var(--muted)}
+.chip-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.chip{font-size:.76rem;background:var(--alt);border:1px solid var(--border);padding:4px 10px;border-radius:999px;cursor:pointer}.chip:hover{background:var(--light);border-color:var(--primary)}
+.photo-box{border:2px dashed var(--primary);background:var(--light);border-radius:12px;padding:14px;text-align:center}
+.photo-preview{max-height:180px;border-radius:10px;margin-top:10px;display:none;max-width:100%}
+.table-wrap{overflow-x:auto}table{width:100%;border-collapse:collapse;font-size:.88rem}
+th,td{padding:10px 12px;border-bottom:1px solid var(--border);text-align:left}th{background:var(--alt)}
+.chart-box{width:100%;overflow-x:auto}canvas#priceChart{display:block}
+.legend{display:flex;flex-wrap:wrap;gap:12px;font-size:.8rem;margin-top:8px}.legend i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:4px}
+.suggest{background:var(--light);border:1px solid var(--primary);border-left:6px solid var(--primary);border-radius:12px;padding:14px;margin-top:14px}
+.suggest h4{color:var(--dark);margin-bottom:6px}.suggest p{font-size:.9rem;margin-bottom:6px}
+.modal-backdrop{position:fixed;inset:0;background:rgba(12,28,18,.55);display:none;align-items:center;justify-content:center;padding:16px;z-index:60}
+.modal-backdrop.open{display:flex}
+.modal{background:var(--surface);border-radius:var(--r);max-width:460px;width:100%;padding:20px;box-shadow:0 12px 30px rgba(0,0,0,.2);max-height:90vh;overflow-y:auto}
+.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.close-btn{background:none;border:none;font-size:1.4rem;cursor:pointer;color:var(--muted)}
+.nitem{padding:9px 11px;border:1px solid var(--border);border-radius:10px;margin-bottom:8px;font-size:.88rem;background:var(--alt)}.nitem.new{background:var(--accl);border-color:var(--accent)}.nitem small{color:var(--muted);display:block}
+.ai-fab{position:fixed;bottom:18px;right:18px;background:var(--dark);color:#fff;border:none;border-radius:999px;padding:12px 18px;font-weight:700;font-size:.9rem;box-shadow:0 6px 18px rgba(0,0,0,.22);cursor:pointer;z-index:50}
+.ai-drawer{position:fixed;bottom:74px;right:18px;width:375px;max-width:calc(100vw - 36px);background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:0 10px 28px rgba(0,0,0,.2);display:none;flex-direction:column;z-index:55;overflow:hidden}
+.ai-drawer.open{display:flex}
+.ai-head{background:var(--primary);color:#fff;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;font-weight:700}
+.ai-lang-bar{padding:8px 12px;background:var(--alt);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;font-size:.8rem;font-weight:700}
+.ai-lang-bar select{padding:5px 8px;font-size:.82rem;flex:1}
+.ai-quick-chips{padding:8px 10px;background:#fff;border-bottom:1px solid var(--border);display:flex;flex-wrap:wrap;gap:5px}
+.ai-messages{padding:12px;height:205px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;font-size:.86rem;background:var(--bg)}
+.msg{padding:8px 11px;border-radius:10px;max-width:88%;word-break:break-word}
+.msg.bot{background:#fff;border:1px solid var(--border);align-self:flex-start}.msg.user{background:var(--primary);color:#fff;align-self:flex-end}
+.speak-mini{display:inline-block;margin-top:5px;font-size:.74rem;background:var(--light);color:var(--dark);border:none;border-radius:6px;padding:2px 7px;cursor:pointer;font-weight:700}
+.ai-input-row{display:flex;gap:6px;padding:10px;border-top:1px solid var(--border);background:#fff}
+.ai-input-row .btn{padding:8px 10px}
+.mic-recording{background:var(--danger)!important;color:#fff!important;border-color:var(--danger)!important}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1a241e;color:#fff;padding:10px 18px;border-radius:999px;font-size:.86rem;font-weight:600;z-index:80;display:none;max-width:90vw;text-align:center}
+.empty-state{text-align:center;padding:36px 16px;color:var(--muted);background:var(--surface);border-radius:var(--r);border:1px dashed var(--border);grid-column:1/-1}
+</style></head>
+<body>
+<header><div class="nav-container">
+<div class="brand"><div class="brand-logo">🌱</div><div><h1>FarmDirect</h1><p>Local Farmer Market Information System</p></div></div>
+<nav class="nav-links" id="navLinks"></nav>
+</div></header>
+
+<main>
+<section id="sec-market" class="section active">
+<div class="hero"><div><h2>Fresh Harvest Direct from Local Farmers</h2><p>Browse real crop photos uploaded by farmers, compare direct farm prices against retail markets, and book produce instantly.</p></div><div class="hero-stats" id="heroStats"></div></div>
+<div class="filter-bar">
+<input type="text" id="searchInput" placeholder="Search crop, place, or farmer name..." oninput="renderMarket()"/>
+<select id="catFilter" onchange="renderMarket()"><option value="All">All Categories</option><option>Vegetables</option><option>Fruits</option><option>Grains</option><option>Dairy/Honey</option></select>
+<select id="placeFilter" onchange="renderMarket()"><option value="All">All Farm Places</option></select>
+</div>
+<div class="grid" id="marketGrid"></div>
+</section>
+
+<section id="sec-chart" class="section"><div class="panel">
+<h3>Smart Price Comparison Chart (Farmer vs Farmer vs Retail Market)</h3>
+<p style="font-size:.88rem;color:var(--muted);margin-bottom:14px">When several farmers sell the same crop, every farmer's price is shown beside the retail market price.</p>
+<div class="chart-box"><canvas id="priceChart" width="960" height="320"></canvas></div>
+<div class="legend" id="chartLegend"></div>
+<div id="suggestBox"></div>
+</div></section>
+
+<section id="sec-orders" class="section"><div class="panel">
+<h3>My Bookings (with Farmer Contact)</h3>
+<div class="form-grid" style="margin-bottom:12px"><div class="form-group"><label>Your Mobile Number</label><input type="tel" id="myPhone" placeholder="Enter the number used for booking"/></div><div class="form-group"><label>&nbsp;</label><button class="btn btn-primary" style="width:100%" onclick="setMyPhone()">Show My Bookings</button></div></div>
+<div class="table-wrap"><table><thead><tr><th>Order ID</th><th>Crop</th><th>Farmer</th><th>Farmer Phone</th><th>Qty</th><th>Total</th><th>Status</th></tr></thead><tbody id="myOrdersBody"></tbody></table></div>
+</div></section>
+
+<section id="sec-farmer" class="section">
+<div class="panel"><h3>Add Harvest Produce with Crop Photo (Publishes Live to Consumers)</h3>
+<form id="farmerForm" onsubmit="submitProduce(event)">
+<div class="form-grid">
+<div class="form-group"><label>Crop / Product Name *</label><input type="text" id="fCrop" required placeholder="e.g., Tomato" oninput="autoFillMarketPrice()"/><div class="chip-row" id="rememberedCropChips"></div></div>
+<div class="form-group"><label>Category *</label><select id="fCategory"><option>Vegetables</option><option>Fruits</option><option>Grains</option><option>Dairy/Honey</option></select></div>
+<div class="form-group"><label>Farm Place / Village *</label><input type="text" id="fPlace" required placeholder="Type your village or farm location"/><div class="chip-row" id="rememberedPlaceChips"></div></div>
+<div class="form-group"><label>Your Direct Farm Price (₹ / unit) *</label><input type="number" id="fFarmPrice" min="1" step="0.5" required placeholder="e.g., 30"/></div>
+<div class="form-group"><label>Local Market Reference Price (₹ / unit) *</label><input type="number" id="fMarketPrice" min="1" step="0.5" required placeholder="e.g., 45"/></div>
+<div class="form-group"><label>Available Quantity *</label><input type="number" id="fQty" min="1" required placeholder="e.g., 50"/></div>
+<div class="form-group"><label>Unit *</label><select id="fUnit"><option>kg</option><option>dozen</option><option>litre</option><option>quintal</option></select></div>
+</div>
+<div class="form-group" style="margin-top:14px"><label>Mandatory Crop Photo (Camera or Gallery) *</label>
+<div class="photo-box"><input type="file" id="fPhotoInput" accept="image/*" onchange="handlePhotoUpload(event)"/><p style="font-size:.8rem;color:var(--muted);margin-top:6px">Take a photo of your harvested crop to publish directly to consumers.</p><img id="fPhotoPreview" class="photo-preview" alt="Crop preview"/></div></div>
+<button type="submit" class="btn btn-primary" style="margin-top:14px;width:100%">Publish Produce to Consumer Market</button>
+</form></div>
+<div class="panel"><h3>My Live Produce Listings</h3><div class="grid" id="farmerListingsGrid"></div></div>
+<div class="panel"><h3>Consumer Bookings for My Produce</h3><div class="table-wrap"><table><thead><tr><th>Order ID</th><th>Consumer</th><th>Phone</th><th>Crop</th><th>Qty</th><th>Total</th><th>Status</th><th>Action</th></tr></thead><tbody id="farmerOrdersBody"></tbody></table></div></div>
+</section>
+</main>
+
+<div class="modal-backdrop" id="bookModal"><div class="modal">
+<div class="modal-header"><h3>Book Farm Produce</h3><button class="close-btn" onclick="closeModal('bookModal')">&times;</button></div>
+<div id="bookItemDetails" style="margin-bottom:12px;font-size:.9rem"></div>
+<form onsubmit="confirmBooking(event)"><input type="hidden" id="bookProductId"/>
+<div class="form-group" style="margin-bottom:10px"><label>Your Name *</label><input type="text" id="bConsumerName" required placeholder="Enter your full name"/></div>
+<div class="form-group" style="margin-bottom:10px"><label>Your Mobile Number *</label><input type="tel" id="bConsumerPhone" required pattern="[0-9]{10}" placeholder="e.g., 9876543210"/></div>
+<div class="form-group" style="margin-bottom:12px"><label>Quantity *</label><input type="number" id="bQty" min="1" required/></div>
+<button type="submit" class="btn btn-primary" style="width:100%">Confirm Booking</button></form>
+</div></div>
+
+<div class="modal-backdrop" id="loginModal"><div class="modal">
+<div class="modal-header"><h3>Farmer Login</h3><button class="close-btn" onclick="closeModal('loginModal')">&times;</button></div>
+<form onsubmit="farmerLogin(event)">
+<div class="form-group" style="margin-bottom:10px"><label>Farmer Name *</label><input type="text" id="lName" required/></div>
+<div class="form-group" style="margin-bottom:12px"><label>Mobile Number * (consumers will see this)</label><input type="tel" id="lPhone" required pattern="[0-9]{10}" placeholder="10 digit number"/></div>
+<button type="submit" class="btn btn-accent" style="width:100%">Login</button></form>
+</div></div>
+
+<div class="modal-backdrop" id="notifModal"><div class="modal">
+<div class="modal-header"><h3>🔔 Notifications</h3><button class="close-btn" onclick="closeModal('notifModal')">&times;</button></div>
+<div id="notifList"></div>
+</div></div>
+
+<button class="ai-fab" onclick="toggleAI()">🎙️ AgriVoice AI</button>
+<div class="ai-drawer" id="aiDrawer">
+<div class="ai-head"><span>AgriVoice Assistant</span><button class="close-btn" style="color:#fff" onclick="toggleAI()">&times;</button></div>
+<div class="ai-lang-bar">🌐 Language <select id="aiLang" onchange="aiGreet()"><option value="en">English</option><option value="kn">ಕನ್ನಡ (Kannada)</option><option value="hi">हिन्दी (Hindi)</option></select></div>
+<div class="ai-quick-chips" id="aiChips"></div>
+<div class="ai-messages" id="aiMsgs"></div>
+<div class="ai-input-row"><input type="text" id="aiInput" placeholder="Type or speak..." onkeydown="if(event.key==='Enter')aiSend()"/><button class="btn btn-outline" id="micBtn" onclick="startMic()">🎤</button><button class="btn btn-primary" onclick="aiSend()">Send</button></div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const $=id=>document.getElementById(id);
+const ld=(k,d)=>{try{const v=JSON.parse(localStorage.getItem(k));return v===null?d:v}catch(e){return d}};
+const sv=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){toast('Storage full — use a smaller photo')}};
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const seed=[
+{id:1,crop:'Tomato',cat:'Vegetables',place:'Tumakuru',farmer:'Ramesh',phone:'9876500001',fp:24,mp:40,qty:100,unit:'kg',img:''},
+{id:2,crop:'Tomato',cat:'Vegetables',place:'Sira',farmer:'Suresh',phone:'9876500002',fp:28,mp:40,qty:80,unit:'kg',img:''},
+{id:3,crop:'Potato',cat:'Vegetables',place:'Hassan',farmer:'Mahesh',phone:'9876500003',fp:30,mp:42,qty:200,unit:'kg',img:''},
+{id:4,crop:'Honey',cat:'Dairy/Honey',place:'Chikkamagaluru',farmer:'Lakshmi',phone:'9876500004',fp:350,mp:450,qty:40,unit:'litre',img:''}];
+let P=ld('fd_p',null)||seed,O=ld('fd_o',[]),N=ld('fd_n',[]),F=ld('fd_f',null),CP=ld('fd_c',''),photo='';
+const ICON={Vegetables:'🥕',Fruits:'🍎',Grains:'🌾','Dairy/Honey':'🍯'};
+function toast(m){const t=$('toast');t.textContent=m;t.style.display='block';clearTimeout(t._t);t._t=setTimeout(()=>t.style.display='none',3500)}
+function openModal(id){$(id).classList.add('open')}function closeModal(id){$(id).classList.remove('open')}
+const me=()=>['all',F?'f'+F.phone:null,CP?'c'+CP:null].filter(Boolean);
+
+/* ---------- Notifications (in-app + browser) ---------- */
+function notify(to,msg){
+ N.unshift({id:Date.now()+Math.random(),to,msg,t:new Date().toLocaleString(),r:0});N=N.slice(0,100);sv('fd_n',N);
+ if(me().includes(to)){toast('🔔 '+msg);browserNote(msg)}
+ renderNav();
+}
+function browserNote(m){try{if('Notification' in window&&Notification.permission==='granted')new Notification('FarmDirect',{body:m})}catch(e){}}
+function askNotifPerm(){try{if('Notification' in window&&Notification.permission==='default')Notification.requestPermission()}catch(e){}}
+const unread=()=>N.filter(n=>me().includes(n.to)&&!n.r).length;
+function openNotifs(){
+ const mine=N.filter(n=>me().includes(n.to));
+ $('notifList').innerHTML=mine.length?mine.map(n=>`<div class="nitem ${n.r?'':'new'}">${esc(n.msg)}<small>${n.t}</small></div>`).join(''):'<div class="empty-state">No notifications yet.</div>';
+ openModal('notifModal');N.forEach(n=>{if(me().includes(n.to))n.r=1});sv('fd_n',N);renderNav();
+}
+window.addEventListener('storage',()=>{
+ const old=N.length;P=ld('fd_p',P);O=ld('fd_o',O);N=ld('fd_n',N);
+ N.slice(0,Math.max(0,N.length-old)).filter(n=>me().includes(n.to)).forEach(n=>{toast('🔔 '+n.msg);browserNote(n.msg)});
+ renderAll();
+});
+
+/* ---------- Navigation ---------- */
+function renderNav(){
+ const cur=(location.hash||'#sec-market');
+ const a=(h,l)=>`<a href="${h}" class="nav-btn ${cur===h?'active':''}">${l}</a>`;
+ let h=a('#sec-market','Consumer Market')+a('#sec-chart','Pricing')+a('#sec-orders','My Bookings');
+ if(F)h+=a('#sec-farmer','My Farm');
+ const u=unread();
+ h+=`<button class="nav-btn" onclick="openNotifs()">🔔${u?`<span class="dot">${u}</span>`:''}</button>`;
+ h+=F?`<span class="role-pill">👨‍🌾 ${esc(F.name)}</span><button class="nav-btn logout" onclick="logout()">Logout</button>`:`<button class="nav-btn farmer-login" onclick="openModal('loginModal')">Farmer Login</button>`;
+ $('navLinks').innerHTML=h;
+}
+function route(){
+ let id=(location.hash||'#sec-market').slice(1);
+ if(!$(id)||!id.startsWith('sec-'))id='sec-market';
+ if(id==='sec-farmer'&&!F){id='sec-market';openModal('loginModal')}
+ document.querySelectorAll('.section').forEach(s=>s.classList.toggle('active',s.id===id));
+ renderNav();if(id==='sec-chart')drawChart();
+}
+window.addEventListener('hashchange',route);
+function farmerLogin(e){e.preventDefault();F={name:$('lName').value.trim(),phone:$('lPhone').value.trim()};sv('fd_f',F);closeModal('loginModal');askNotifPerm();toast('Welcome, '+F.name);location.hash='#sec-farmer';renderAll();route()}
+function logout(){F=null;localStorage.removeItem('fd_f');location.hash='#sec-market';renderAll();route()}
+
+/* ---------- Market ---------- */
+function renderMarket(){
+ const q=$('searchInput').value.toLowerCase(),c=$('catFilter').value,pl=$('placeFilter').value;
+ const sel=$('placeFilter'),places=[...new Set(P.map(p=>p.place))];
+ if(sel.options.length!==places.length+1){sel.innerHTML='<option value="All">All Farm Places</option>'+places.map(x=>`<option>${esc(x)}</option>`).join('');sel.value=places.includes(pl)?pl:'All'}
+ const list=P.filter(p=>(c==='All'||p.cat===c)&&($('placeFilter').value==='All'||p.place===$('placeFilter').value)&&(p.crop+p.place+p.farmer).toLowerCase().includes(q));
+ $('marketGrid').innerHTML=list.length?list.map(p=>{
+  const sv_=Math.max(0,Math.round((p.mp-p.fp)/p.mp*100));
+  const rivals=P.filter(x=>x.crop.toLowerCase()===p.crop.toLowerCase()).length;
+  return `<div class="card"><div class="card-img-wrap">${p.img?`<img src="${p.img}" alt="${esc(p.crop)}"/>`:ICON[p.cat]||'🌱'}<span class="badge">${esc(p.place)}</span><span class="cat-tag">${esc(p.cat)}</span></div>
+  <div class="card-body"><div class="card-title"><h3>${esc(p.crop)}</h3><span class="savings-pill">Save ${sv_}%</span></div>
+  <div class="price-row"><span class="farm-price">₹${p.fp}/${p.unit}</span><span class="market-price">₹${p.mp}</span></div>
+  <div class="meta-list"><div>👨‍🌾 <strong>${esc(p.farmer)}</strong> · 📞 <a href="tel:${p.phone}">${p.phone}</a></div><div>📦 Available: <strong>${p.qty} ${p.unit}</strong></div>${rivals>1?`<div>⚖️ ${rivals} farmers sell this — <a href="#sec-chart">compare</a></div>`:''}</div>
+  <div class="card-actions"><button class="btn btn-primary" ${p.qty<1?'disabled':''} onclick="openBook(${p.id})">${p.qty<1?'Sold Out':'Book Now'}</button><a class="btn btn-outline" href="tel:${p.phone}">📞 Call Farmer</a></div></div></div>`}).join(''):'<div class="empty-state">No produce found.</div>';
+ const avg=P.length?Math.round(P.reduce((s,p)=>s+(p.mp-p.fp)/p.mp*100,0)/P.length):0;
+ $('heroStats').innerHTML=`<div class="stat-box"><strong>${new Set(P.map(p=>p.phone)).size}</strong><span>Farmers</span></div><div class="stat-box"><strong>${P.length}</strong><span>Live listings</span></div><div class="stat-box"><strong>${avg}%</strong><span>Avg savings</span></div>`;
+}
+function openBook(id){
+ const p=P.find(x=>x.id===id);if(!p)return;
+ $('bookProductId').value=id;$('bQty').max=p.qty;$('bQty').value=1;$('bConsumerPhone').value=CP;
+ $('bookItemDetails').innerHTML=`<strong>${esc(p.crop)}</strong> — ₹${p.fp}/${p.unit} from ${esc(p.farmer)}, ${esc(p.place)}<br>📞 Farmer phone: <a href="tel:${p.phone}">${p.phone}</a> · Available: ${p.qty} ${p.unit}`;
+ openModal('bookModal');
+}
+function confirmBooking(e){
+ e.preventDefault();
+ const p=P.find(x=>x.id==$('bookProductId').value),q=+$('bQty').value;
+ if(!p||q<1||q>p.qty){toast('Quantity not available');return}
+ const o={id:'FD'+Date.now().toString().slice(-6),pid:p.id,crop:p.crop,unit:p.unit,farmer:p.farmer,fphone:p.phone,cname:$('bConsumerName').value.trim(),cphone:$('bConsumerPhone').value.trim(),qty:q,total:q*p.fp,status:'Pending'};
+ p.qty-=q;O.unshift(o);CP=o.cphone;sv('fd_p',P);sv('fd_o',O);sv('fd_c',CP);
+ closeModal('bookModal');askNotifPerm();
+ notify('f'+o.fphone,`New booking ${o.id}: ${o.cname} (📞 ${o.cphone}) wants ${q} ${o.unit} ${o.crop} — ₹${o.total}`);
+ notify('c'+o.cphone,`Booking ${o.id} placed for ${q} ${o.unit} ${o.crop}. Farmer ${o.farmer}: 📞 ${o.fphone}`);
+ renderAll();
+}
+function setMyPhone(){const v=$('myPhone').value.trim();if(!/^\d{10}$/.test(v)){toast('Enter a valid 10 digit number');return}CP=v;sv('fd_c',CP);renderAll()}
+function renderMyOrders(){
+ $('myPhone').value=CP;const m=O.filter(o=>o.cphone===CP);
+ $('myOrdersBody').innerHTML=m.length?m.map(o=>`<tr><td>${o.id}</td><td>${esc(o.crop)}</td><td>${esc(o.farmer)}</td><td><a href="tel:${o.fphone}">📞 ${o.fphone}</a></td><td>${o.qty} ${o.unit}</td><td>₹${o.total}</td><td>${o.status}</td></tr>`).join(''):'<tr><td colspan="7" style="text-align:center;color:var(--muted)">No bookings found for this number.</td></tr>';
+}
+
+/* ---------- Farmer portal ---------- */
+function handlePhotoUpload(e){
+ const f=e.target.files[0];if(!f)return;const r=new FileReader();
+ r.onload=()=>{const im=new Image();im.onload=()=>{const s=Math.min(1,600/im.width),c=document.createElement('canvas');c.width=im.width*s;c.height=im.height*s;c.getContext('2d').drawImage(im,0,0,c.width,c.height);photo=c.toDataURL('image/jpeg',.7);const pv=$('fPhotoPreview');pv.src=photo;pv.style.display='inline-block'};im.src=r.result};
+ r.readAsDataURL(f);
+}
+function autoFillMarketPrice(){const v=$('fCrop').value.trim().toLowerCase(),m=P.find(p=>p.crop.toLowerCase()===v);if(m){$('fMarketPrice').value=m.mp;$('fCategory').value=m.cat;$('fUnit').value=m.unit}}
+function chips(){
+ const mk=(arr,id,tgt)=>{$(id).innerHTML=[...new Set(arr)].map(x=>`<span class="chip" onclick="$('${tgt}').value=this.textContent;autoFillMarketPrice()">${esc(x)}</span>`).join('')};
+ mk(P.map(p=>p.crop),'rememberedCropChips','fCrop');mk(P.filter(p=>F&&p.phone===F.phone).map(p=>p.place),'rememberedPlaceChips','fPlace');
+}
+function submitProduce(e){
+ e.preventDefault();if(!F){openModal('loginModal');return}
+ if(!photo){toast('Please upload a crop photo');return}
+ const p={id:Date.now(),crop:$('fCrop').value.trim(),cat:$('fCategory').value,place:$('fPlace').value.trim(),farmer:F.name,phone:F.phone,fp:+$('fFarmPrice').value,mp:+$('fMarketPrice').value,qty:+$('fQty').value,unit:$('fUnit').value,img:photo};
+ P.unshift(p);sv('fd_p',P);photo='';$('farmerForm').reset();$('fPhotoPreview').style.display='none';
+ notify('all',`🌾 New: ${p.crop} at ₹${p.fp}/${p.unit} from ${p.farmer}, ${p.place}`);
+ toast('Published to consumers');renderAll();
+}
+function delProduce(id){P=P.filter(p=>p.id!==id);sv('fd_p',P);renderAll()}
+function renderFarmer(){
+ if(!F)return;chips();
+ const mine=P.filter(p=>p.phone===F.phone);
+ $('farmerListingsGrid').innerHTML=mine.length?mine.map(p=>`<div class="card"><div class="card-img-wrap">${p.img?`<img src="${p.img}"/>`:ICON[p.cat]}</div><div class="card-body"><h3>${esc(p.crop)}</h3><div class="meta-list"><div>₹${p.fp}/${p.unit} (market ₹${p.mp})</div><div>${p.qty} ${p.unit} left · ${esc(p.place)}</div></div><button class="btn btn-danger" onclick="delProduce(${p.id})">Remove</button></div></div>`).join(''):'<div class="empty-state">No listings yet.</div>';
+ const mo=O.filter(o=>o.fphone===F.phone),next={Pending:'Confirmed',Confirmed:'Delivered'};
+ $('farmerOrdersBody').innerHTML=mo.length?mo.map(o=>`<tr><td>${o.id}</td><td>${esc(o.cname)}</td><td><a href="tel:${o.cphone}">📞 ${o.cphone}</a></td><td>${esc(o.crop)}</td><td>${o.qty} ${o.unit}</td><td>₹${o.total}</td><td>${o.status}</td><td>${next[o.status]?`<button class="btn btn-primary" onclick="advance('${o.id}')">Mark ${next[o.status]}</button>`:'✔'}</td></tr>`).join(''):'<tr><td colspan="8" style="text-align:center;color:var(--muted)">No bookings yet.</td></tr>';
+}
+function advance(id){
+ const o=O.find(x=>x.id===id),next={Pending:'Confirmed',Confirmed:'Delivered'};if(!o||!next[o.status])return;
+ o.status=next[o.status];sv('fd_o',O);
+ notify('c'+o.cphone,`Your order ${o.id} (${o.crop}) is now ${o.status}. Farmer ${o.farmer}: 📞 ${o.fphone}`);renderAll();
+}
+
+/* ---------- Smart Price Chart ---------- */
+const COLS=['#1b6b3a','#e07a16','#1e6fd9','#8e44ad','#c62828'];
+function groups(){
+ const m={};P.forEach(p=>{const k=p.crop.trim().toLowerCase();(m[k]=m[k]||{name:p.crop,l:[]}).l.push(p)});
+ return Object.values(m).map(g=>({...g,l:g.l.sort((a,b)=>a.fp-b.fp),mp:Math.round(g.l.reduce((s,p)=>s+p.mp,0)/g.l.length*10)/10}));
+}
+function drawChart(){
+ const g=groups(),c=$('priceChart'),x=c.getContext('2d'),gw=210;
+ c.width=Math.max(960,g.length*gw+20);c.height=320;x.clearRect(0,0,c.width,320);
+ const max=Math.max(1,...g.flatMap(a=>[a.mp,...a.l.map(p=>p.fp)]))*1.15;
+ x.strokeStyle='#d5e0d9';x.beginPath();x.moveTo(10,270);x.lineTo(c.width-10,270);x.stroke();
+ g.forEach((a,i)=>{
+  const bars=[...a.l.map((p,j)=>({v:p.fp,n:p.farmer,c:COLS[j%5]})),{v:a.mp,n:'Market',c:'#8a9a90'}],bw=Math.min(36,(gw-30)/bars.length-4),x0=i*gw+20;
+  bars.forEach((b,k)=>{const h=b.v/max*220,bx=x0+k*(bw+4);x.fillStyle=b.c;x.fillRect(bx,270-h,bw,h);x.fillStyle='#1a241e';x.font='bold 11px sans-serif';x.fillText('₹'+b.v,bx,266-h);x.font='10px sans-serif';x.fillText(b.n.slice(0,6),bx,283)});
+  x.font='bold 13px sans-serif';x.fillText(a.name,x0,305);
+ });
+ const names=[...new Set(P.map(p=>p.farmer))];
+ $('chartLegend').innerHTML=names.map((n,i)=>`<span><i style="background:${COLS[i%5]}"></i>Farmer ${esc(n)} (colour by rank within each crop)</span>`).slice(0,0).join('')+'<span><i style="background:#1b6b3a"></i>Cheapest farmer</span><span><i style="background:#e07a16"></i>2nd farmer</span><span><i style="background:#1e6fd9"></i>3rd farmer</span><span><i style="background:#8a9a90"></i>Retail market</span>';
+ $('suggestBox').innerHTML=g.map(a=>{
+  const b=a.l[0];
+  if(a.l.length>1){const o=a.l[1],d=(o.fp-b.fp).toFixed(1).replace(/\.0$/,''),mk=(a.mp-b.fp).toFixed(1).replace(/\.0$/,'');
+   return `<div class="suggest"><h4>💡 Suggestion: ${esc(a.name)}</h4><p>Buy from <strong>${esc(b.farmer)}</strong> (${esc(b.place)}) at <strong>₹${b.fp}/${b.unit}</strong> — ₹${d} cheaper than ${esc(o.farmer)} (₹${o.fp}) and ₹${mk} below the market price (₹${a.mp}).</p><button class="btn btn-primary" onclick="openBook(${b.id})">Book from ${esc(b.farmer)}</button> <a class="btn btn-outline" href="tel:${b.phone}">📞 ${b.phone}</a></div>`}
+  return `<div class="suggest"><h4>💡 ${esc(a.name)}</h4><p>Only ${esc(b.farmer)} sells this at ₹${b.fp}/${b.unit} (market ₹${a.mp}).</p><button class="btn btn-primary" onclick="openBook(${b.id})">Book Now</button></div>`}).join('');
+}
+
+/* ---------- AgriVoice multilingual assistant ---------- */
+const LANG={en:'en-IN',kn:'kn-IN',hi:'hi-IN'};
+const AL={tomato:['tomato','ಟೊಮೆಟೊ','ಟೊಮ್ಯಾಟೊ','टमाटर'],potato:['potato','ಆಲೂಗಡ್ಡೆ','आलू'],onion:['onion','ಈರುಳ್ಳಿ','प्याज'],mango:['mango','ಮಾವು','आम'],honey:['honey','ಜೇನು','शहद']};
+const TX={
+ en:{hi:'Hello! Ask me about crop prices, e.g. "cheapest tomato".',cheap:(p,n)=>`Cheapest ${p.crop}: ${p.farmer} at ₹${p.fp} per ${p.unit} in ${p.place}. Phone ${p.phone}.${n>1?` ${n} farmers sell it.`:''}`,none:l=>'Sorry, I could not find that crop. Available: '+l,help:'Try: "tomato price", "what is available", or "how to book".',list:l=>'Available crops: '+l,how:'Tap Book Now on a crop, enter your name, phone and quantity. The farmer is notified instantly and you can call them.',chips:['Cheapest tomato','What is available','How to book']},
+ kn:{hi:'ನಮಸ್ಕಾರ! ಬೆಳೆಗಳ ಬೆಲೆ ಕೇಳಿ, ಉದಾ: "ಟೊಮೆಟೊ ಬೆಲೆ".',cheap:(p,n)=>`ಅಗ್ಗದ ${p.crop}: ${p.farmer}, ಪ್ರತಿ ${p.unit} ₹${p.fp}, ${p.place}. ಫೋನ್ ${p.phone}.${n>1?` ${n} ರೈತರು ಮಾರುತ್ತಿದ್ದಾರೆ.`:''}`,none:l=>'ಕ್ಷಮಿಸಿ, ಆ ಬೆಳೆ ಸಿಗಲಿಲ್ಲ. ಲಭ್ಯ: '+l,help:'"ಟೊಮೆಟೊ ಬೆಲೆ" ಅಥವಾ "ಏನು ಲಭ್ಯ" ಎಂದು ಕೇಳಿ.',list:l=>'ಲಭ್ಯ ಬೆಳೆಗಳು: '+l,how:'ಬೆಳೆಯ ಮೇಲೆ Book Now ಒತ್ತಿ, ಹೆಸರು, ಫೋನ್ ಮತ್ತು ಪ್ರಮಾಣ ನೀಡಿ. ರೈತರಿಗೆ ತಕ್ಷಣ ಸೂಚನೆ ಹೋಗುತ್ತದೆ.',chips:['ಟೊಮೆಟೊ ಬೆಲೆ','ಏನು ಲಭ್ಯ','ಬುಕ್ ಮಾಡುವುದು ಹೇಗೆ']},
+ hi:{hi:'नमस्ते! फसलों के दाम पूछें, जैसे "टमाटर का दाम".',cheap:(p,n)=>`सबसे सस्ता ${p.crop}: ${p.farmer}, ₹${p.fp} प्रति ${p.unit}, ${p.place}। फोन ${p.phone}।${n>1?` ${n} किसान बेच रहे हैं।`:''}`,none:l=>'माफ़ कीजिए, वह फसल नहीं मिली। उपलब्ध: '+l,help:'"टमाटर का दाम" या "क्या उपलब्ध है" पूछें।',list:l=>'उपलब्ध फसलें: '+l,how:'फसल पर Book Now दबाएं, नाम, फोन और मात्रा भरें। किसान को तुरंत सूचना मिलती है।',chips:['सबसे सस्ता टमाटर','क्या उपलब्ध है','बुक कैसे करें']}
+};
+const lg=()=>$('aiLang').value;
+function toggleAI(){$('aiDrawer').classList.toggle('open');if($('aiDrawer').classList.contains('open')&&!$('aiMsgs').children.length)aiGreet()}
+function aiGreet(){$('aiMsgs').innerHTML='';$('aiChips').innerHTML=TX[lg()].chips.map(c=>`<span class="chip" onclick="aiAsk(this.textContent)">${esc(c)}</span>`).join('');addMsg('bot',TX[lg()].hi)}
+function addMsg(who,t){const d=document.createElement('div');d.className='msg '+who;d.textContent=t;if(who==='bot'){const b=document.createElement('button');b.className='speak-mini';b.textContent='🔊 Listen';b.onclick=()=>speak(t);d.appendChild(document.createElement('br'));d.appendChild(b)}$('aiMsgs').appendChild(d);$('aiMsgs').scrollTop=1e6}
+function speak(t){try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang=LANG[lg()];const v=speechSynthesis.getVoices().find(v=>v.lang.startsWith(lg()));if(v)u.voice=v;speechSynthesis.speak(u)}catch(e){toast('Voice playback not supported in this browser')}}
+function answer(q){
+ const L=TX[lg()],s=q.toLowerCase(),all=[...new Set(P.map(p=>p.crop))].join(', ');
+ if(/book|ಬುಕ್|बुक/.test(s))return L.how;
+ if(/available|list|what|ಲಭ್ಯ|ಏನು|उपलब्ध|क्या/.test(s)&&!Object.values(AL).flat().some(a=>s.includes(a)))return L.list(all);
+ let m=P.filter(p=>s.includes(p.crop.toLowerCase()));
+ if(!m.length)for(const k in AL)if(AL[k].some(a=>s.includes(a))){m=P.filter(p=>p.crop.toLowerCase().includes(k));break}
+ if(m.length){m.sort((a,b)=>a.fp-b.fp);return L.cheap(m[0],m.length)}
+ return /price|cheap|rate|ಬೆಲೆ|दाम|भाव/.test(s)?L.none(all):L.help;
+}
+function aiAsk(q,speakIt){addMsg('user',q);const a=answer(q);addMsg('bot',a);if(speakIt)speak(a)}
+function aiSend(){const v=$('aiInput').value.trim();if(!v)return;$('aiInput').value='';aiAsk(v)}
+function startMic(){
+ const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+ if(!SR){toast('Voice input is not supported in this browser (try Chrome). You can type instead.');return}
+ const r=new SR(),b=$('micBtn');r.lang=LANG[lg()];r.interimResults=false;
+ r.onstart=()=>b.classList.add('mic-recording');r.onend=()=>b.classList.remove('mic-recording');
+ r.onerror=e=>{b.classList.remove('mic-recording');toast('Mic error: '+e.error)};
+ r.onresult=e=>aiAsk(e.results[0][0].transcript,true);
+ try{r.start()}catch(e){}
+}
+
+function renderAll(){renderMarket();renderFarmer();renderMyOrders();renderNav();if($('sec-chart').classList.contains('active'))drawChart()}
+renderAll();route();
+</script>
+</body></html>
